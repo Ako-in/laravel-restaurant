@@ -20,11 +20,10 @@
     
           <hr>
 
-          
-    
           <div class="row g-3 d-flex">
             @foreach($cart as $menu)
               <div class="col-md2 mt-2">
+                
                 <a href="{{route('customer.menus.show',$menu->id)}}">
                   <div class="mb-2">
                     @if ($menu->image !== '')
@@ -32,6 +31,12 @@
                     @else
                         <img src="{{ asset('/images/no_image.jpg') }}" class="w-100">
                     @endif
+                    {{-- 画像を表示する --}}
+                    {{-- @if (!empty($item->options->image))
+                      <img src="{{ asset('storage/' . $item->options->image) }}" alt="商品画像" class="w-100">
+                    @else
+                      <img src="{{ asset('/images/no_image.jpg') }}" class="w-100">
+                    @endif --}}
                   </div>
                 </a>
               </div>
@@ -39,7 +44,10 @@
                 <h3 class="mt-4">{{$menu->name}}</h3>
               </div>
               <div class="col-md-2">
-                <h3 class="w-100 mt-4">{{$menu->qty}}pcs</h3>
+                <h3 class="w-100 mt-4">¥{{$menu->price}}/pcs</h3>
+              </div>  
+              <div class="col-md-2">
+                <h3 class="w-100 mt-4">注文数：{{$menu->qty}}pcs</h3>
               </div>
               <div class="col-md-2">
                 <h3 class="w-100 mt-4">¥{{$menu->qty * $menu->price}}</h3>
@@ -48,6 +56,7 @@
                 <a href="{{ route('carts.edit', $menu->id) }}" class="btn btn-primary">Edit</a>
                 <a href="{{ route('carts.destroy', $menu->id) }}" class="btn btn-danger">Delete</a>
             </div>
+            <hr>
               {{-- <p>小計JPY{{$subTotal}}</p> --}}
             @endforeach
           </div>
@@ -56,9 +65,9 @@
     
           <div class="offset-8 col-4">
             <div class="row">
-                <div class="col-6">
+                {{-- <div class="col-6">
                     <h2>小計:JPY{{$subTotal}}</h2>
-                </div>
+                </div> --}}
                 {{-- <div class="col-6">
                     <h2>JPY{{$total}}</h2>
                 </div> --}}

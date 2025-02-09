@@ -23,25 +23,26 @@ class CartController extends Controller
      */
     public function index()
     {
-        $cartInstance = Auth::check() ? Auth::user()->id : session()->getId();
+        
+        dd(Auth::id());
+        // Log::info('カートに追加した内容carts.index:',['cart'=>$cart]);
 
-        $cart = Cart::instance($cartInstance)->content();
+        // $total = 0;
+        // $subTotal=0;
 
-        Log::info('カートに追加した内容carts.index:',['cart'=>$cart]);
+        // foreach ($cart as $menu) {
+        //     $subTotal += $menu->qty * $menu->price;
+        // }
+        // $total += $subTotal;
+
+        // Log::info('Total Price:', ['subTotal' => $subTotal, 'total' => $total]);
 
         //カートの中身を表示
+        $cart = Cart::content();
         // $cart = Cart::instance(Auth::user()->id)->content();
-
-        $total = 0;
-        $subTotal=0;
-
-        foreach ($cart as $menu) {
-            $subTotal += $menu->qty * $menu->price;
-        }
-        $total += $subTotal;
-
-        Log::info('Total Price:', ['subTotal' => $subTotal, 'total' => $total]);
-
+        $subTotal = Cart::subtotal();
+        $total = Cart::total();
+        // dd(Cart::content());
 
         return view('carts.index', compact('cart', 'total','subTotal'));
     }
@@ -86,11 +87,11 @@ class CartController extends Controller
                 'qty' => $request->qty, 
                 'price' => $request->price, 
                 'weight' => 0, // 必ずデフォルト値を指定
-                // 'options' => [
-                //     // 'request' => $request->request,
-                //     // 'image' => $request->image,
-                //     // 'table_number' => $request->table_number,
-                // ],
+                'options' => [
+                    // 'request' => $request->request,
+                    'image' => $request->image,
+                    'table_number' => 1,//仮で1を入れている
+                ],
             ] 
         );
 
@@ -107,6 +108,7 @@ class CartController extends Controller
      */
     public function show($id)
     {
+        dd(Auth::user()->id);
         //カートの中身を表示
         // $cart = Cart::instance(Auth::user()->id)->get($id);
         $cart = Cart::instance(Auth::user()->id)->content();
@@ -252,18 +254,19 @@ class CartController extends Controller
             'id' => $request->id, 
             'name' => $request->name, 
             'qty' => $request->qty, 
-            'price' => $request->price, 
+            'price' => $request->price, //税込を想定 config/cart.php taxで税率変更できる。今は０としている。
             'weight' => 0, // 必ずデフォルト値を指定
             'options' => [
                 // 'request' => $request->request,
-                // 'image' => $request->image,
+                'image' => $request->image,
                 'table_number' => 1,
             ],
             // 'subTotal' => $request->price, 
             // 'total' => $request->qty * $request->price,
         ]);
-        dd(Cart::content());
+        // dd(Cart::content());
 
+        // dd($request->image);
         Log::info('addの後ろ',$request->all());
         // Cart::add([
         //     'id' => 2, 

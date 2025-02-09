@@ -4,7 +4,7 @@
     <div class="container my-4">
         <div class="row justify-content-center">
             <div class="col-xl-3 col-lg-4 col-md-5 col-sm-7">
-                <h1 class="mb-4 text-center">管理画面ログイン</h1>
+                <h1 class="mb-4 text-center">ユーザーログイン</h1>
 
                 <hr class="mb-4">
 
@@ -18,10 +18,10 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('admin.login') }}">
+                <form method="POST" action="{{ route('login') }}">
                     @csrf
                     <div class="form-group mb-3">
-                            <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" required autocomplete="email" placeholder="メールアドレス" autofocus>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" required autocomplete="email" placeholder="メールアドレス" autofocus>
                     </div>
 
                     <div class="form-group mb-3">
