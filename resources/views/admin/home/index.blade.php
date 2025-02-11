@@ -28,7 +28,7 @@
                   <div class="card bg-light">
                       <div class="card-body text-center">
                         <h5 class="card-title">
-                          <a href="{{route('admin.admin.orders.index')}}"class="btn btn-primary">注文オーダー</a>
+                          <a href="{{route('admin.orders.index')}}"class="btn btn-primary">注文オーダー</a>
                         </h5>
                           {{-- <h5 class="card-title">注文オーダー</h5> --}}
                           {{-- <p class="card-text">{{ $total_free_users }}名</p> --}}

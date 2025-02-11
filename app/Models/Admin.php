@@ -12,6 +12,9 @@ class Admin extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
     protected $table = 'admins';
+
+    protected $guard = 'admin';
+
     protected $fillable = [
         'email',
         'password',
@@ -21,9 +24,5 @@ class Admin extends Authenticatable
         'password',
         'remember_token',
     ];
-
-    // protected $casts = [
-    //     'password' => 'hashed', // パスワードを自動ハッシュ化
-    // ];
 
 }

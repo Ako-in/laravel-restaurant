@@ -5,20 +5,28 @@
             <div class="flex">
                 @if(request()->is('admin/*')) 
                     {{-- 管理画面用のナビゲーション --}}
-                    <nav class="bg-dark text-white p-3">
-                        <a href="{{ route('admin.menus.index') }}">新規メニュー作成</a>
-                        <a href="{{ route('admin.admin.orders.index') }}">注文</a>
-                        <a href="{{ route('admin.menus.index') }}">メニュー編集,在庫
-                        </a>
-                        <a href="{{ route('admin.logout') }}">Logout</a>
-                    </nav>
-            
                     <!-- Logo -->
                     <div class="shrink-0 flex items-center">
                         <a href="{{ route('admin.home') }}">
                             <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
                         </a>
                     </div>
+                    {{-- <nav class="bg-dark text-white p-3"> --}}
+                        <div class="ml-4">
+                            <a href="{{ route('admin.home') }}">Home</a>
+                            <a href="{{ route('admin.menus.index') }}">　Menus</a>
+                            <a href="{{ route('admin.orders.index') }}">　Orders</a>
+                            <a href="{{ route('admin.menus.index') }}">　Edit Menus, Stock</a>
+                            {{-- <a href="{{ route('admin.logout') }}">　Logout</a> --}}
+                        </div>
+                            
+                        {{-- <a href="{{ route('admin.menus.index') }}">新規メニュー作成</a>
+                        <a href="{{ route('admin.orders.index') }}">注文</a>
+                        <a href="{{ route('admin.menus.index') }}">メニュー編集,在庫</a>
+                        <a href="{{ route('admin.logout') }}">Logout</a> --}}
+                    {{-- </nav> --}}
+            
+                    
                 @else
                     {{-- 一般ユーザー用のナビゲーション --}}
                     <!-- Logo -->
@@ -87,15 +95,27 @@
                         </x-dropdown-link>
 
                         <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
+                        @if(request()->is('admin/*')) 
+                            <form method="POST" action="{{ route('admin.logout') }}">
+                                @csrf
 
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
+                                <x-dropdown-link :href="route('admin.logout')"
+                                        onclick="event.preventDefault();
+                                                    this.closest('form').submit();">
+                                    {{ __('Log Out') }}
+                                </x-dropdown-link>
+                            </form>
+                        @else
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+
+                                <x-dropdown-link :href="route('logout')"
+                                        onclick="event.preventDefault();
+                                                    this.closest('form').submit();">
+                                    {{ __('Log Out') }}
+                                </x-dropdown-link>
+                            </form>
+                        @endif
                     </x-slot>
                 </x-dropdown>
             </div>

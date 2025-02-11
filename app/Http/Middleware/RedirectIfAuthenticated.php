@@ -19,24 +19,26 @@ class RedirectIfAuthenticated
      */
     public function handle(Request $request, Closure $next, ...$guards)
     {
-        $guards = empty($guards) ? [null] : $guards;
-
-        // foreach ($guards as $guard) {
-        //     if (Auth::guard($guard)->check()) {
-        //         if ($guard === 'admin') {
-        //             return redirect(RouteServiceProvider::ADMIN_HOME);
-        //         }
-        //     }
-        //     return redirect(RouteServiceProvider::HOME);
-        // }
+        $guards = empty($guards) ? [null] : $guards; //$guards が空の場合 null を設定
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
                 return redirect($guard === 'admin' ? RouteServiceProvider::ADMIN_HOME : RouteServiceProvider::HOME);
+                // if ($guard === 'admin') {
+                //     return redirect(RouteServiceProvider::ADMIN_HOME);
+                }
             }
-            return redirect(RouteServiceProvider::HOME);
+            return $next($request);
+            // return redirect(RouteServiceProvider::HOME);
         }
 
-        return $next($request);
-    }
+        // foreach ($guards as $guard) {
+        //     if (Auth::guard($guard)->check()) {
+        //         return redirect($guard === 'admin' ? RouteServiceProvider::ADMIN_HOME : RouteServiceProvider::HOME);
+        //     }
+        //     return redirect(RouteServiceProvider::HOME);
+        // }
+
+        // return $next($request);
+    
 }

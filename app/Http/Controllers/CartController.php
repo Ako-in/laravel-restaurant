@@ -23,8 +23,7 @@ class CartController extends Controller
      */
     public function index()
     {
-        
-        dd(Auth::id());
+        // dd(Auth::user());//ok
         // Log::info('カートに追加した内容carts.index:',['cart'=>$cart]);
 
         // $total = 0;
@@ -77,7 +76,7 @@ class CartController extends Controller
             'request' => 'nullable|string',
         ]);
 
-        dd('カートテストstore');    
+        // dd('カートテストstore');    
 
         // Cart::instance(Auth::user()->id)->add(
         Cart::add(
@@ -95,7 +94,7 @@ class CartController extends Controller
             ] 
         );
 
-        dd(Cart::content()); // カートの中身を確認
+        // dd(Cart::content()); // カートの中身を確認
 
         return redirect()->route('carts.index');
     }
@@ -108,7 +107,7 @@ class CartController extends Controller
      */
     public function show($id)
     {
-        dd(Auth::user()->id);
+        // dd(Auth::user()->id);
         //カートの中身を表示
         // $cart = Cart::instance(Auth::user()->id)->get($id);
         $cart = Cart::instance(Auth::user()->id)->content();
@@ -136,12 +135,23 @@ class CartController extends Controller
     public function edit(Request $request, $id)
     {
         //カートの中身を編集
-        $cart = Cart::instance(Auth::user()->id)->get($id);
+        $cart = Cart::instance(Auth::user()->id)->content();
 
-        logger($cart->content()); // カート内の全データをログに出力
+        logger($cart); // カート内の全データをログに出力
 
-        $item = $cart->get($id); 
-        return view('carts.edit', compact('cart'));
+        $item = $cart->firstWhere('rowId', $id); // 指定されたIDのアイテムを取得
+        // dd($item);
+        // 指定されたIDのアイテムがカート内にあるか確認
+        // if (!$cart->search(fn($cartItem) => $cartItem->rowId === $id)->isNotEmpty()) {
+        //     return redirect()->route('carts.index')->with('error', '指定された商品がカートに存在しません。');
+        // }
+
+        if (!$item) {
+            return redirect()->route('carts.index')->with('error', '指定された商品がカートに存在しません。');
+        }
+
+        // $item = $cart->get($id); 
+        return view('carts.edit', compact('cart','item'));
     }
 
     /**
@@ -156,10 +166,13 @@ class CartController extends Controller
         //カートの中身を更新
         $request->validate([
             'qty' => 'required|integer|min:1',
-            'request' => 'nullable|string',
+            // 'request' => 'nullable|string',
         ]);
-        Cart::instance(Auth::user()->id)->update($id, $request->qty, $request->request);
-        return redirect()->route('carts.index');
+        //カート内の全アイテムを取得
+        $cart = Cart::instance(Auth::user()->id)->content();
+
+        Cart::instance(Auth::user()->id)->update($id, $request->qty);
+        return redirect()->route('carts.index')->with('success', 'カートを更新しました。');
     }
 
     /**
