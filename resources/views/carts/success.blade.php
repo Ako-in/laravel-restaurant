@@ -12,7 +12,8 @@
                             <h5 class="card-title">{{$menu->menu->name}}</h5>
                             <p class="card-text">Price:{{$menu->menu->price}}JPY</p>
                             <p class="card-text">Quantity:{{$menu->quantity}}</p>
-                            <p class="card-text">Request:{{$menu->request}}</p>
+                            {{-- <p class="card-text">Request:{{$menu->request}}</p> --}}
+                            <p class="card-text">Table number:</p>
                         </div>
                         
                     </div>

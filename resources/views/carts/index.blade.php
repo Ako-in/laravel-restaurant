@@ -26,11 +26,12 @@
                 
                 <a href="{{route('customer.menus.show',$menu->id)}}">
                   <div class="mb-2">
-                    @if ($menu->image !== '')
+                    {{-- 画像表示は未実装。あとで再度確認 --}}
+                    {{-- @if ($menu->image !== '')
                         <img src="{{ asset('storage/' . $menu->image) }}" alt="Menu Image" class="w-100">
                     @else
                         <img src="{{ asset('/images/no_image.jpg') }}" class="w-100">
-                    @endif
+                    @endif --}}
                     {{-- 画像を表示する --}}
                     {{-- @if (!empty($item->options->image))
                       <img src="{{ asset('storage/' . $item->options->image) }}" alt="商品画像" class="w-100">
@@ -52,10 +53,18 @@
               <div class="col-md-2">
                 <h3 class="w-100 mt-4">¥{{$menu->qty * $menu->price}}</h3>
               </div>
-              <div>
-                <a href="{{ route('carts.edit', $menu->id) }}" class="btn btn-primary">Edit</a>
-                <a href="{{ route('carts.destroy', $menu->id) }}" class="btn btn-danger">Delete</a>
-            </div>
+              {{-- 編集、削除ボタン未実装。あとで見直す --}}
+              {{-- <div>
+                <a href="{{ route('carts.edit', $menu->id) }}" class="btn btn-primary">編集</a>
+                <form action="{{ route('carts.destroy', $menu->id) }}" method="POST">
+                  @csrf
+                  @method('DELETE')
+                  <button type="submit" class="btn btn-danger">削除</button>
+                </form> --}}
+              
+                {{-- <a href="{{ route('carts.edit', $menu->id) }}" class="btn btn-primary">Edit</a> --}}
+                {{-- <a href="{{ route('carts.destroy', $menu->id) }}" class="btn btn-danger">Delete</a> --}}
+              {{-- </div> --}}
             <hr>
               {{-- <p>小計JPY{{$subTotal}}</p> --}}
             @endforeach
@@ -90,7 +99,7 @@
 
               <form action="{{ route('carts.success') }}" method="POST">
                   @csrf
-                <button type="submit" class="btn submit-button w-100">注文送信</a>
+                <button type="submit" class="btn submit-button w-100">注文送信</button>
                 {{-- <a href="{{route('carts.success')}}"class="btn btn-primary">注文送信</a> --}}
               </form>  
                 @else

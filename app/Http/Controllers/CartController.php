@@ -24,7 +24,7 @@ class CartController extends Controller
     public function index()
     {
         // dd(Auth::user());//ok
-        // Log::info('カートに追加した内容carts.index:',['cart'=>$cart]);
+        
 
         // $total = 0;
         // $subTotal=0;
@@ -37,8 +37,9 @@ class CartController extends Controller
         // Log::info('Total Price:', ['subTotal' => $subTotal, 'total' => $total]);
 
         //カートの中身を表示
-        $cart = Cart::content();
-        // $cart = Cart::instance(Auth::user()->id)->content();
+        // $cart = Cart::content();
+        $cart = Cart::instance(Auth::user()->id)->content();
+        // dd(Auth::user()->id);
         $subTotal = Cart::subtotal();
         $total = Cart::total();
         // dd(Cart::content());
@@ -78,8 +79,8 @@ class CartController extends Controller
 
         // dd('カートテストstore');    
 
-        // Cart::instance(Auth::user()->id)->add(
-        Cart::add(
+        Cart::instance(Auth::user()->id)->add(
+        // Cart::add(
             [
                 'id' => $request->id, 
                 'name' => $request->name, 
@@ -113,17 +114,17 @@ class CartController extends Controller
         $cart = Cart::instance(Auth::user()->id)->content();
 
         // 特定の rowId を取得
-        $rowId = 'your_row_id';  // 実際の rowId に置き換えてください
-        $item = $cart->firstWhere('rowId', $rowId);
+        // $rowId = 'your_row_id';  // 実際の rowId に置き換えてください
+        $item = $cart->firstWhere('id', $id);
 
         // アイテムが見つかった場合に表示
         if ($item) {
             return view('carts.show', compact('item'));
         } else {
             // アイテムが見つからない場合
-            return redirect()->route('carts.index');
+            return redirect()->route('carts.index')->with('error', '指定された商品がカートに存在しません。');
         }
-        return view('carts.show', compact('cart'));
+        // return view('carts.show', compact('cart'));
     }
 
     /**
@@ -139,7 +140,7 @@ class CartController extends Controller
 
         logger($cart); // カート内の全データをログに出力
 
-        $item = $cart->firstWhere('rowId', $id); // 指定されたIDのアイテムを取得
+        $item = $cart->firstWhere('id', $id); // 指定されたIDのアイテムを取得
         // dd($item);
         // 指定されたIDのアイテムがカート内にあるか確認
         // if (!$cart->search(fn($cartItem) => $cartItem->rowId === $id)->isNotEmpty()) {
@@ -188,64 +189,6 @@ class CartController extends Controller
         return redirect()->route('carts.index');
     }
 
-    public function success(){
-        //購入完了画面
-        $carts = Cart::instance(Auth::user()->id)->content();
-        $orderTotal = 0;
-        foreach ($carts as $cart) {
-            $orderTotal += $cart->qty * $cart->price;
-        }
-        if ($carts->isEmpty()) {
-            return redirect()->route('carts.index')->with('error', 'カートが空です。');
-        }
-        //購入処理
-        $shoppingCart = new ShoppingCart();
-
-        // $shoppingCart->identifier = Str::uuid(); // UUIDを使用
-        // $shoppingCart->user_id = Auth::user()->id;
-        $shoppingCart->menu_id = $cart->id;
-        // $shoppingCart->instance = Auth::user()->id;//menu name
-        $shoppingCart->qty = $cart->quantity;
-        $shoppingCart->price = $cart->price;
-        
-        $shoppingCart->total = $orderTotal;
-        $shoppingCart->table_number = 1;//仮で1を入れている
-        $shoppingCart->status = 1;
-        // $shoppingCart->identifier = $cart->rowId;
-        // 一意な識別子を生成
-        
-        $shoppingCart->content = $cart->name;
-
-        $shoppingCart->request = is_object($cart->options->request) || is_array($cart->options->request)
-        ? json_encode($cart->options->request) // オブジェクトや配列を JSON 文字列に変換
-        : $cart->options->request; // それ以外はそのまま
-
-        $shoppingCart->code = uniqid(); // uniqidで一意なコードを生成。不要のためあとでカラムを削除
-        $shoppingCart->save();
-        
-        foreach ($carts as $cart) {
-            $shoppingCart->update([
-                'id' => $cart->id,
-                // 'quantity' => $cart->quantity,
-                'quantity' => $cart->quantity ?? 1, // デフォルト値を 1 に設定
-                'price' => $cart->price, 
-                'total' => $cart->quantity * $cart->price,
-                // 'request' => $cart->options->request ?? null]);
-                // 'request' => is_object($cart->options->request) || is_array($cart->options->request)
-                // ? json_encode($cart->options->request) // オブジェクトや配列を JSON 文字列に変換
-                // : $cart->options->request // それ以外はそのまま
-
-                // 'request' => $cart->options->request,//requestは今はクローズしているのでコメントアウト
-            ]);
-        }
-        Cart::instance(Auth::user()->id)->destroy();
-        // 成功メッセージと注文内容を渡してビューを返す
-        return view('carts.success', [
-            'message' => '注文が確定しました',
-            'shoppingCart' => $shoppingCart,
-        ]);
-    }
-    
     public function add(Request $request)
     {
         // Log::info('カートに追加リクエスト１',$request->all()); //log ok
@@ -263,7 +206,7 @@ class CartController extends Controller
 
         Log::info('addの前',$request->all());
         // dd($request->all());
-        Cart::add([
+        Cart::instance(Auth::user()->id)->add([
             'id' => $request->id, 
             'name' => $request->name, 
             'qty' => $request->qty, 
@@ -296,8 +239,95 @@ class CartController extends Controller
         // session()->flash('success', '商品をカートに追加しました！');
         // dd(session()->all());
     }
-    
 
+    public function success(){
+        //購入完了画面
+        // dd(Auth::user());//ok
+        Log::info('successメソッドが通る');
+        // dd('successメソッドが通る');//ok
+        $carts = Cart::instance(Auth::user()->id)->content();
+        
+        // dd($instance->content);
+        $orderTotal = 0;
+        foreach ($carts as $cart) {
+            $orderTotal += $cart->qty * $cart->price;
+        }
+        if ($carts->isEmpty()) {
+            return redirect()->route('carts.index')->with('error', 'カートが空です。');
+        }
+        // dd('orderTotal');//NG
+        // dd($orderTotal);
+        //購入処理
+        foreach($carts as $cart){
+            ShoppingCart::create([
+                'identifier' => Str::uuid(),
+                'user_id' => Auth::user()->id,
+                'menu_id' => $cart->id,
+                'qty' => $cart->qty,
+                'price' => $cart->price,
+                'total' => $cart->qty * $cart->price,
+                'table_number' => 1,//仮で1を入れている
+                'status' => 1,
+                'instance' => 'default_instance',
+                'content' => $cart->name,
+                'code' => uniqid(),
+            ]);
+        }
+
+        // $shoppingCart = new ShoppingCart();
+
+        // $shoppingCart->identifier = Str::uuid(); // UUIDを使用、ユニーク制約、重複を防ぐ
+        // $shoppingCart->user_id = Auth::user()->id;
+        // $shoppingCart->menu_id = $cart->id;
+        // // $shoppingCart->instance = Auth::user()->id;//menu name
+        // $shoppingCart->qty = $cart->quantity ?? 1; // デフォルト値を 1 に設定
+        // $shoppingCart->price = $cart->price;
+        
+        // $shoppingCart->total = $orderTotal;
+        // $shoppingCart->table_number = 1;//仮で1を入れている
+        // $shoppingCart->status = 1;
+        // // $shoppingCart->identifier = $cart->id;//必要？
+
+        // $shoppingCart->instance = 'default_instance';//必要？
+        // // 一意な識別子を生成
+        
+        // $shoppingCart->content = $cart->name;
+
+        // // $shoppingCart->request = is_object($cart->options->request) || is_array($cart->options->request)
+        // // ? json_encode($cart->options->request) // オブジェクトや配列を JSON 文字列に変換
+        // // : $cart->options->request; // それ以外はそのまま
+
+        // $shoppingCart->code = uniqid(); // uniqidで一意なコードを生成。不要のためあとでカラムを削除
+        // // $shoppingCart->code = $cart->id; // メニューIDをコードとして使用
+        // $shoppingCart->save();
+        
+        // foreach ($carts as $cart) {
+        //     $shoppingCart->update([
+        //         'id' => $cart->id,
+        //         // 'quantity' => $cart->quantity,
+        //         'qty' => $cart->quantity ?? 1, // デフォルト値を 1 に設定
+        //         'price' => $cart->price, 
+        //         'total' => ($cart->quantity ?? 1) * $cart->price,
+        //         // 'identifier' => $cart->id,//updateに必要なし？
+        //         // 'request' => $cart->options->request ?? null]);
+        //         // 'request' => is_object($cart->options->request) || is_array($cart->options->request)
+        //         // ? json_encode($cart->options->request) // オブジェクトや配列を JSON 文字列に変換
+        //         // : $cart->options->request // それ以外はそのまま
+
+        //         // 'request' => $cart->options->request,//requestは今はクローズしているのでコメントアウト
+        //         'instance' => 'default_instance',//必要？
+        //     ]);
+        // }
+        Cart::instance(Auth::user()->id)->destroy();//カートを空にする
+        // 成功メッセージと注文内容を渡してビューを返す
+        return view('carts.success', [
+            'message' => '注文が確定しました',
+            // 'shoppingCart' => $shoppingCart,
+            'shoppingCart'=>$carts,
+        ]);
+    }
+    
+    
     // public function history_index()
     // {
     //     //購入履歴を表示

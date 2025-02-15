@@ -18,18 +18,22 @@ class CheckoutController extends Controller
     public function index()
     {
         //カートの中身を表示
-        // dd('checkout.index表示テスト');
+        // dd('checkout.index表示テスト');//表示確認済
         $carts = ShoppingCart::with('menu')->where('user_id', Auth::id())->get(); 
 
+        // dd($carts);//表示確認済 
         $orderTotal = 0;
 
         foreach ($carts as $cart) {
             if (isset($cart->menu)) { // menu が存在する場合のみ
-                $subTotal = $cart->menu->price * $cart->quantity;
+                $subTotal = $cart->menu->price * $cart->qty;
                 $orderTotal += $subTotal;
             }
         }
-        return view('checkouts.index', compact('carts', 'orderTotal'));
+        // dd($cart->qty);
+        // dd($subTotal);
+
+        return view('checkouts.index', compact('carts', 'orderTotal','subTotal'));
     }
 
     public function store(Request $request)

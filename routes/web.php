@@ -70,6 +70,11 @@ Route::middleware('auth:web')->group(function () {
     });
     // **カート機能**
     Route::resource('carts', CartController::class);
+    Route::get('carts', [CartController::class, 'index'])->name('carts.index');
+    Route::get('carts/{id}', [CartController::class, 'show'])->name('carts.show');
+    Route::put('carts/{id}', [CartController::class, 'update'])->name('carts.update');
+    Route::get('carts/{id}/edit', [CartController::class, 'edit'])->name('carts.edit');
+    Route::delete('carts/{id}', [CartController::class, 'destroy'])->name('carts.destroy');
     Route::post('carts/add', [CartController::class, 'add'])->name('carts.add');
     Route::post('carts/order', [CartController::class, 'order'])->name('carts.order');
     Route::post('carts/success', [CartController::class, 'success'])->name('carts.success');

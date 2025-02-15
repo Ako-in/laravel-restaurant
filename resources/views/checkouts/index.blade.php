@@ -4,19 +4,22 @@
     <h1>注文履歴・決済画面</h1>
     <div class="row g-3">
       @foreach ($carts as $cart)
-        <div class="col-md-3 mb-3">
-          <div class="card" style="width: 18rem;">
-            <div class="card-body">
-              <h5 class="card-title">{{$cart->menu->name}}</h5>
-              <p class="card-text">Price:{{$cart->menu->price}}JPY</p>
-              <p class="card-text">Quantity:{{$cart->quantity}}</p>
-              <p class="card-text">Request:{{$cart->request}}</p>
-              {{-- <a href="{{route('orders.edit',$cart->id)}}" class="btn btn-primary">Edit</a>
-              <a href="{{route('orders.destroy',$cart->id)}}" class="btn btn-danger">Delete</a> --}}
-              <p class="">小計:{{$subTotal}}JPY</p>
+        @if($cart->menu){{--menuが存在する場合--}}
+          <div class="col-md-3 mb-3">
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title">{{$cart->menu->name}}</h5>
+                <p class="card-text">Price:{{$cart->menu->price}}JPY</p>
+                <p class="card-text">Quantity:{{$cart->qty}}</p>
+                <p class="card-text">Request:{{$cart->request}}</p>
+                {{-- <a href="{{route('orders.edit',$cart->id)}}" class="btn btn-primary">Edit</a>
+                <a href="{{route('orders.destroy',$cart->id)}}" class="btn btn-danger">Delete</a> --}}
+                <p class="">小計:{{$subTotal}}JPY</p>
+                <hr>
+              </div>
             </div>
           </div>
-        </div>
+        @endif
       @endforeach
       
       <p class="">OrderTotal:{{$orderTotal}}JPY</p>
